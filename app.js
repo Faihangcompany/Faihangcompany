@@ -1,21 +1,11 @@
-// app.js - 智能選購邏輯
+// app.js - 替換整個檔案
 const questions = [
-    {
-        key: "category",
-        text: "想要哪種家具？",
-        options: ["裝飾櫃", "餐邊櫃", "地櫃", "地櫃連上座"]
-    },
-    {
-        key: "color",
-        text: "喜歡什麼顏色/木紋？",
-        options: ["ORI胡桃、親橡、橡木", "白木紋", "白木紋、橡木"]
-    },
-    {
-        key: "priceRange",
-        text: "預算範圍？",
-        options: ["$1,000以下", "$1,000-$2,500", "$2,500以上"]
-    }
+    {key: "category", text: "想要哪種家具？", options: ["裝飾櫃", "餐邊櫃", "地櫃", "地櫃連上座"]},
+    {key: "color", text: "喜歡什麼顏色？", options: ["ORI胡桃", "白木紋", "親橡", "橡木"]},
+    {key: "priceRange", text: "預算範圍？", options: ["$1,000以下", "$1,000-$2,500", "$2,500以上"]}
 ];
+
+const availableColors = ["ORI胡桃", "白木紋", "親橡", "橡木"];
 
 let answers = {};
 let currentQuestionIndex = 0;
@@ -25,9 +15,9 @@ function showQuestion() {
     const aArea = document.getElementById("answers-area");
     const rArea = document.getElementById("results-area");
     const restartBtn = document.getElementById("restart");
+    const whatsappReminder = document.getElementById("whatsapp-reminder");
     
-    rArea.innerHTML = "";
-    restartBtn.style.display = "none";
+    rArea.innerHTML = ""; restartBtn.style.display = "none"; whatsappReminder.style.display = "none";
 
     if (currentQuestionIndex >= questions.length) {
         showResults();
@@ -56,6 +46,7 @@ function showResults() {
     const qArea = document.getElementById("question-area");
     const aArea = document.getElementById("answers-area");
     const restartBtn = document.getElementById("restart");
+    const whatsappReminder = document.getElementById("whatsapp-reminder");
     
     qArea.textContent = "💎 根據您的選擇，推薦以下產品：";
     aArea.innerHTML = "";
@@ -64,11 +55,10 @@ function showResults() {
     let matched = products.filter(p => {
         let match = true;
         if (answers.category && p.category !== answers.category) match = false;
-        if (answers.color && !p.color.includes(answers.color.split("、")[0])) match = false;
         if (answers.priceRange) {
-            if (answers.priceRange === "$1,000以下" && p.salePrice >= 1000) match = false;
+            if (answers.priceRange === "$1,000以下" && p.salePrice > 1000) match = false;
             if (answers.priceRange === "$1,000-$2,500" && (p.salePrice < 1000 || p.salePrice > 2500)) match = false;
-            if (answers.priceRange === "$2,500以上" && p.salePrice <= 2500) match = false;
+            if (answers.priceRange === "$2,500以上" && p.salePrice < 2500) match = false;
         }
         return match;
     });
@@ -76,47 +66,61 @@ function showResults() {
     if (matched.length === 0) {
         rArea.innerHTML = `
             <div style="text-align:center; padding:30px; color:#666;">
-                <h3>😊 暫時沒有完全符合的產品</h3>
-                <p>請WhatsApp我們，我們會為您特別推薦！</p>
+                <h3>😊 我們有類似產品可供選擇</h3>
+                <p>請截圖並WhatsApp我們，我們會為您推薦最適合的款式！</p>
             </div>
         `;
+        whatsappReminder.style.display = "block";
         return;
     }
+
+    // 顏色匹配檢查
+    const colorInfo = checkColorAvailability(matched, answers.color || "");
 
     matched.forEach(p => {
         const div = document.createElement("div");
         div.className = "product-card";
+        const colorStatus = p.color.includes(answers.color || "") ? "✅ 原色" : colorInfo.extraCost ? "💰 +$500可改" : "❌ 不可改色";
         div.innerHTML = `
             <div class="category-tag">${p.category}</div>
             <div class="product-code">${p.code}</div>
-            <div class="product-price">
-                <del>原價 HK$${p.originalPrice.toLocaleString()}</del>
-                折實 HK$${p.salePrice.toLocaleString()}
-            </div>
             <div>尺寸: ${p.size}mm</div>
             <div>顏色: ${p.color}</div>
-            <div style="font-size:0.9em; color:#666; margin-top:10px;">${p.note}</div>
+            <div style="font-size:0.9em; color:#666;">${p.note}</div>
+            <div style="margin-top:10px; padding:8px; background:#e8f5e8; border-radius:8px; font-size:0.95em;">
+                ${colorStatus}
+            </div>
         `;
         rArea.appendChild(div);
     });
+
+    // 顯示顏色資訊
+    if (colorInfo.extraCostColors.length > 0 || colorInfo.freeColors.length > 0) {
+        const infoDiv = document.createElement("div");
+        infoDiv.style.cssText = "margin-top:20px; padding:15px; background:#e3f2fd; border-radius:10px; border-left:4px solid #4ecdc4;";
+        infoDiv.innerHTML = `
+            <strong>顏色資訊：</strong><br>
+            ${colorInfo.freeColors.length > 0 ? `✅ 免費顏色：${colorInfo.freeColors.join('、')}` : ''}
+            ${colorInfo.extraCostColors.length > 0 ? `<br>💰 加$500可改：${colorInfo.extraCostColors.join('、')}` : ''}
+        `;
+        rArea.appendChild(infoDiv);
+    }
+
+    whatsappReminder.style.display = "block";
 }
 
-function renderAllProducts() {
-    const container = document.getElementById("product-list");
-    products.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "product-card";
-        div.innerHTML = `
-            <div class="category-tag">${p.category}</div>
-            <div class="product-code">${p.code}</div>
-            <div class="product-price">
-                <del>原價 HK$${p.originalPrice.toLocaleString()}</del>
-                折實 HK$${p.salePrice.toLocaleString()}
-            </div>
-            <div>尺寸: ${p.size}mm | 顏色: ${p.color}</div>
-        `;
-        container.appendChild(div);
-    });
+function checkColorAvailability(products, selectedColor) {
+    const allColors = availableColors.filter(color => 
+        products.some(p => p.color.includes(color))
+    );
+    const freeColors = allColors.filter(color => color !== selectedColor);
+    const extraCostColors = selectedColor && !allColors.includes(selectedColor) ? [selectedColor] : [];
+    
+    return {
+        freeColors,
+        extraCostColors,
+        extraCost: extraCostColors.length > 0
+    };
 }
 
 document.getElementById("restart").onclick = () => {
@@ -127,5 +131,4 @@ document.getElementById("restart").onclick = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     showQuestion();
-    renderAllProducts();
 });
