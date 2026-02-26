@@ -122,4 +122,57 @@ document.getElementById("restart").onclick = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     showQuestion();
+// Add to END of your existing script.js
+const FURNITURE_TREE = {
+    "裝飾櫃": "單款裝飾櫃", "地櫃": "TR083-48 & TR083-60", 
+    "電視櫃": "單款電視櫃", "茶幾": "單款茶幾", 
+    "床頭櫃": "單款床頭櫃", "妝臺": "單款妝臺",
+    "餐邊櫃": ["倭身", "高身"], "桶櫃": ["四桶櫃", "五桶櫃"],
+    "鞋櫃": ["倭身", "高身"], "書桌": ["書桌", "書桌連書架"],
+    "書櫃": ["有玻璃", "無玻璃"], "衣櫃": ["趟門", "拉門"],
+    "床": ["碌架床", "無櫃桶床", "油壓床", "三櫃桶床"]
+};
+
+let gameState = "start";
+
+function startAkinator() {
+    document.getElementById('akinator-game').style.display = 'block';
+    updateGame();
+}
+
+function updateGame() {
+    const q = document.getElementById('question');
+    const opts = document.getElementById('options');
+    const result = document.getElementById('result');
+    
+    opts.innerHTML = ''; result.style.display = 'none';
+    
+    if (gameState === 'start') {
+        q.textContent = '我想猜你想要哪款家具！';
+        ['裝飾櫃','餐邊櫃','地櫃','電視櫃','茶幾','桶櫃','鞋櫃','床頭櫃','妝臺','書桌','書櫃','床','衣櫃']
+            .forEach(cat => addBtn(cat, opts));
+    } else {
+        const node = FURNITURE_TREE[gameState] || FURNITURE_TREE[gameState.split('+')[0]];
+        if (typeof node === 'string') {
+            q.textContent = '✅ 找到啦！';
+            result.innerHTML = `<b>${node}</b> 詳細資料請看產品頁`;
+            result.style.display = 'block';
+        } else {
+            q.textContent = `關於${gameState}: 請選擇`;
+            node.forEach(opt => addBtn(opt, opts));
+        }
+    }
+}
+
+function addBtn(text, container) {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.onclick = () => {
+        gameState = gameState === 'start' ? text : gameState + '+' + text;
+        updateGame();
+    };
+    container.appendChild(btn);
+}
+
 });
+
