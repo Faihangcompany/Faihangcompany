@@ -1,165 +1,57 @@
+<!-- index.html - 替換整個檔案 -->
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>輝航傢俬 - 香港傢俬專家</title>
-    <style>
-        body { font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif; margin: 0; padding: 20px; background: #f8f8f8; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #d32f2f; font-size: 2.5em; margin-bottom: 10px; }
-        h2 { color: #1976d2; border-bottom: 2px solid #1976d2; padding-bottom: 10px; }
-        .category { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
-        .product-img { width: 100%; max-width: 300px; height: auto; border-radius: 8px; }
-        select, input[type="radio"] { font-size: 16px; padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #1976d2; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
-        button:hover { background: #1565c0; }
-        #result { margin-top: 30px; padding: 20px; background: #e8f5e8; border: 2px solid #4caf50; border-radius: 8px; display: none; }
-        .price { font-size: 24px; font-weight: bold; color: #d32f2f; }
-        .question { margin: 15px 0; }
-        label { display: block; margin: 10px 0; font-size: 18px; }
-    </style>
+    <title>暉恒公司（北角紅蘋果）- 家具選購助手</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🌟 輝航傢俬 🌟</h1>
-        <p style="text-align: center; font-size: 18px;">香港專業傢俬訂造，為您度身訂造舒適家居！</p>
+    <header>
+        <h1>🌟 暉恒公司（北角紅蘋果）</h1>
+        <p>專業家具 • 香港製造 • 品質保證</p>
+    </header>
 
-        <div class="category">
-            <h2>1. 裝飾櫃</h2>
-            <img src="https://via.placeholder.com/400x300/e0e0e0/666?text=裝飾櫃" alt="裝飾櫃" class="product-img">
-            <p><strong>特點：</strong>優雅實用，完美裝飾您的客廳。</p>
-        </div>
+    <nav>
+        <a href="#finder" class="btn-primary">找適合我的家具</a>
+        <a href="#catalog" class="btn">產品目錄</a>
+        <a href="#contact" class="btn">聯絡我們</a>
+    </nav>
 
-        <div class="category">
-            <h2>2. 妝臺</h2>
-            <img src="https://via.placeholder.com/400x300/e0e0e0/666?text=妝臺" alt="妝臺" class="product-img">
-            <p><strong>特點：</strong>精緻設計，大鏡面，實用收納。</p>
-        </div>
-
-        <div class="category">
-            <h2>3. 桶櫃</h2>
-            <div class="question">
-                <label>請問您想要幾桶的櫃子？</label>
-                <label><input type="radio" name="tong" value="4"> 四桶櫃</label>
-                <label><input type="radio" name="tong" value="5"> 五桶櫃</label>
+    <main>
+        <section id="finder">
+            <h2>🧠 智能家具選購助手</h2>
+            <div id="question-area"></div>
+            <div id="answers-area"></div>
+            <div id="results-area"></div>
+            <button id="restart" class="btn" style="display:none;">重新開始</button>
+            <div id="whatsapp-reminder" style="display:none;">
+                <p>📱 <strong>請截圖以上結果並WhatsApp我們：</strong></p>
+                <a href="https://wa.me/85253908976" class="btn">立即查詢 ➡️</a>
             </div>
-        </div>
+        </section>
 
-        <div class="category">
-            <h2>4. 床類選擇</h2>
-            <div class="question">
-                <label>第一步：您想要哪種床型？</label>
-                <label><input type="radio" name="bed_type" value="san"> 三櫃桶床</label>
-                <label><input type="radio" name="bed_type" value="you"> 油壓床</label>
-                <label><input type="radio" name="bed_type" value="wu"> 無底床</label>
-                <label><input type="radio" name="bed_type" value="lu"> 碌架床</label>
+        <section id="catalog">
+            <h2>📦 完整產品目錄</h2>
+            <div class="catalog-links">
+                <p>查看最新產品目錄和報價：</p>
+                <a href="https://linktr.ee/faihang_redapple" target="_blank" class="btn-primary">前往Linktree ➡️</a>
             </div>
-            
-            <div id="bed_head_question" class="question" style="display:none;">
-                <label>第二步：床頭要不要皮墊？</label>
-                <label><input type="radio" name="bed_head" value="yes"> 要皮墊</label>
-                <label><input type="radio" name="bed_head" value="no"> 不要皮墊</label>
+        </section>
+
+        <section id="contact">
+            <h2>📱 立即聯絡</h2>
+            <div class="contact-info">
+                <p><strong>WhatsApp:</strong> <a href="https://wa.me/85253908976">5390 8976</a></p>
+                <p><strong>Instagram:</strong> <a href="https://www.instagram.com/faihang_redapple">@faihang_redapple</a></p>
+                <p><strong>地址:</strong> 北角紅蘋果門市</p>
+                <p>發送產品編號給我們，即刻報價！</p>
             </div>
+        </section>
+    </main>
 
-            <div id="bed_tail_question" class="question" style="display:none;">
-                <label>第三步：床尾要不要櫃子？（僅三櫃桶床）</label>
-                <label><input type="radio" name="bed_tail" value="yes"> 要床尾櫃</label>
-                <label><input type="radio" name="bed_tail" value="no"> 不要床尾櫃</label>
-            </div>
-        </div>
-
-        <div style="text-align: center;">
-            <button onclick="calculatePrice()">查看報價</button>
-            <button onclick="resetForm()">重新選擇</button>
-        </div>
-
-        <div id="result">
-            <h2>💰 您的專屬報價</h2>
-            <div id="price_display"></div>
-            <p>立即聯絡我們安排上門度尺及詳細報價！</p>
-            <p><strong>WhatsApp:</strong> <a href="https://wa.me/85212345678">1234 5678</a></p>
-        </div>
-    </div>
-
-    <script>
-        // 床類選擇邏輯
-        document.querySelectorAll('input[name="bed_type"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const headQuestion = document.getElementById('bed_head_question');
-                const tailQuestion = document.getElementById('bed_tail_question');
-                
-                headQuestion.style.display = 'block';
-                tailQuestion.style.display = 'none';
-                
-                if (this.value === 'san') {
-                    tailQuestion.style.display = 'block';
-                }
-            });
-        });
-
-        function calculatePrice() {
-            const tong = document.querySelector('input[name="tong"]:checked');
-            const bedType = document.querySelector('input[name="bed_type"]:checked');
-            const bedHead = document.querySelector('input[name="bed_head"]:checked');
-            const bedTail = document.querySelector('input[name="bed_tail"]:checked');
-            
-            if (!tong || !bedType || !bedHead) {
-                alert('請完成所有必填選項！');
-                return;
-            }
-            
-            let price = 0;
-            let details = [];
-            
-            // 桶櫃價格
-            if (tong.value === '4') {
-                price += 3500;
-                details.push('四桶櫃 - $3,500');
-            } else {
-                price += 4200;
-                details.push('五桶櫃 - $4,200');
-            }
-            
-            // 床類價格
-            let bedPrice = 0;
-            switch(bedType.value) {
-                case 'san': bedPrice = 6800; details.push('三櫃桶床 - $6,800'); break;
-                case 'you': bedPrice = 7500; details.push('油壓床 - $7,500'); break;
-                case 'wu': bedPrice = 5200; details.push('無底床 - $5,200'); break;
-                case 'lu': bedPrice = 3800; details.push('碌架床 - $3,800'); break;
-            }
-            
-            // 床頭皮墊
-            if (bedHead.value === 'yes') {
-                price += 800;
-                details.push('床頭皮墊 - +$800');
-            }
-            
-            // 床尾櫃（僅三櫃桶）
-            if (bedType.value === 'san' && bedTail && bedTail.value === 'yes') {
-                price += 1200;
-                details.push('床尾櫃 - +$1,200');
-            }
-            
-            document.getElementById('price_display').innerHTML = `
-                <div class="price">總價：$${price.toLocaleString()}</div>
-                <div style="margin-top: 15px;">
-                    <h3>明細：</h3>
-                    <ul>${details.map(d => `<li>${d}</li>`).join('')}</ul>
-                </div>
-            `;
-            
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function resetForm() {
-            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-            document.getElementById('bed_head_question').style.display = 'none';
-            document.getElementById('bed_tail_question').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-        }
-    </script>
+    <script src="products.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
