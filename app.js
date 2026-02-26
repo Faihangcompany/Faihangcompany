@@ -1,88 +1,38 @@
-// app.js - 動態問題 + 條件分支（繁體中文）
-let answers = {};
-let currentStep = 0;
-
-const steps = [
-    {
-        key: "mainCategory",
-        text: "想要哪種家具？",
-        options: [
-            "裝飾櫃", "餐邊櫃", "地櫃", "電視櫃", "茶幾", "桶櫃", "鞋櫃", 
-            "床頭櫃", "妝臺", "書桌", "書桌連書架", "書櫃", "床", "衣櫃"
-        ]
-    },
-    // 其他固定問題可加在這裡，例如尺寸偏好、顏色等
+// app.js - 完美問題順序 + 真實類別（替換整個檔案）
+const questions = [
+    {key: "category", text: "想要哪種家具？", options: ["裝飾櫃", "餐邊櫃", "地櫃", "電視櫃", "茶幾", "四桶櫃", "五桶櫃", "鞋櫃", "床頭櫃", "妝臺", "書桌", "書桌連書架", "書櫃", "上下床", "無櫃桶床", "油壓床(普通)", "油壓床(有皮)", "油壓床(高身)", "三櫃桶床(普通)", "三櫃桶床(普通有皮)", "衣櫃"]},
+    {key: "priceRange", text: "預算範圍？", options: ["$1,000以下", "$1,000-$3,000", "$3,000-$5,000", "$5,000以上"]},
+    {key: "color", text: "喜歡什麼顏色？", options: ["ORI胡桃", "白木紋", "親橡", "橡木"]}
 ];
 
-function getCurrentStep() {
-    const main = answers.mainCategory;
-
-    if (currentStep === 1) {
-        if (main === "桶櫃") {
-            return {
-                key: "drawerCount",
-                text: "你要4桶還是5桶？",
-                options: ["4桶", "5桶"]
-            };
-        }
-        if (main === "床") {
-            return {
-                key: "bedType",
-                text: "你要哪一種床？",
-                options: ["三櫃桶", "油壓", "無底", "碌架床"]
-            };
-        }
-        // 其他類別如果需要額外問題，也可在此加
-        return null; // 無額外問題 → 直接結束
-    }
-
-    if (currentStep === 2 && answers.mainCategory === "床") {
-        return {
-            key: "hasLeather",
-            text: "床頭要不要有皮墊？",
-            options: ["有", "沒有"]
-        };
-    }
-
-    if (currentStep === 3 && answers.mainCategory === "床" && answers.bedType === "三櫃桶") {
-        return {
-            key: "hasFootCabinet",
-            text: "要不要加床尾櫃？",
-            options: ["有", "沒有"]
-        };
-    }
-
-    return null;
-}
+let answers = {};
+let currentQuestionIndex = 0;
 
 function showQuestion() {
     const qArea = document.getElementById("question-area");
     const aArea = document.getElementById("answers-area");
     const rArea = document.getElementById("results-area");
     const restartBtn = document.getElementById("restart");
-    const whatsapp = document.getElementById("whatsapp-reminder");
+    const whatsappReminder = document.getElementById("whatsapp-reminder");
+    
+    rArea.innerHTML = ""; restartBtn.style.display = "none"; whatsappReminder.style.display = "none";
 
-    rArea.innerHTML = "";
-    restartBtn.style.display = "none";
-    whatsapp.style.display = "none";
-
-    const step = steps[currentStep] || getCurrentStep();
-
-    if (!step) {
+    if (currentQuestionIndex >= questions.length) {
         showResults();
         return;
     }
 
-    qArea.textContent = step.text;
+    const q = questions[currentQuestionIndex];
+    qArea.textContent = q.text;
     aArea.innerHTML = "";
 
-    step.options.forEach(opt => {
+    q.options.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "answer-btn";
         btn.textContent = opt;
         btn.onclick = () => {
-            answers[step.key] = opt;
-            currentStep++;
+            answers[q.key] = opt;
+            currentQuestionIndex++;
             showQuestion();
         };
         aArea.appendChild(btn);
@@ -90,92 +40,86 @@ function showQuestion() {
 }
 
 function showResults() {
+    const rArea = document.getElementById("results-area");
     const qArea = document.getElementById("question-area");
     const aArea = document.getElementById("answers-area");
-    const rArea = document.getElementById("results-area");
     const restartBtn = document.getElementById("restart");
-    const whatsapp = document.getElementById("whatsapp-reminder");
-
-    qArea.textContent = "為你推薦的產品如下（請截圖保存）：";
+    const whatsappReminder = document.getElementById("whatsapp-reminder");
+    
+    qArea.textContent = "💎 推薦產品（請截圖保存）：";
     aArea.innerHTML = "";
     restartBtn.style.display = "block";
 
-    let filtered = products.filter(p => {
-        const main = answers.mainCategory;
-        if (!main) return false;
-
-        // 單品類別直接比對
-        if (["裝飾櫃", "妝臺", "床頭櫃", "茶幾", "電視櫃", "地櫃", "餐邊櫃", "鞋櫃", "書桌", "書桌連書架", "書櫃", "衣櫃"].includes(main)) {
-            return p.category === main;
+    let matched = products.filter(p => {
+        let match = true;
+        if (answers.category && p.category !== answers.category) match = false;
+        if (answers.priceRange) {
+            const price = p.salePrice;
+            if (answers.priceRange === "$1,000以下" && price > 1000) match = false;
+            if (answers.priceRange === "$1,000-$3,000" && (price < 1000 || price > 3000)) match = false;
+            if (answers.priceRange === "$3,000-$5,000" && (price < 3000 || price > 5000)) match = false;
+            if (answers.priceRange === "$5,000以上" && price < 5000) match = false;
         }
-
-        // 桶櫃
-        if (main === "桶櫃") {
-            const targetCat = answers.drawerCount === "4桶" ? "四桶櫃" : "五桶櫃";
-            return p.category === targetCat;
-        }
-
-        // 床類
-        if (main === "床") {
-            let bedCats = [];
-            if (answers.bedType === "三櫃桶") {
-                bedCats = answers.hasFootCabinet === "有"
-                    ? ["三櫃桶床(普通)連床尾櫃", "三櫃桶床(普通有皮)連床尾櫃"]
-                    : ["三櫃桶床(普通)", "三櫃桶床(普通有皮)"];
-            } else if (answers.bedType === "油壓") {
-                bedCats = ["油壓床(普通)", "油壓床(有皮)", "油壓床(高身)"];
-            } else if (answers.bedType === "無底") {
-                bedCats = ["無櫃桶床"];
-            } else if (answers.bedType === "碌架床") {
-                bedCats = ["上下床"];
-            }
-
-            let match = bedCats.some(cat => p.category.includes(cat));
-
-            // 皮墊篩選
-            if (answers.hasLeather === "有") {
-                match = match && (p.category.includes("有皮") || p.note.includes("生態皮"));
-            } else if (answers.hasLeather === "沒有") {
-                match = match && !p.category.includes("有皮") && !p.note.includes("生態皮");
-            }
-
-            return match;
-        }
-
-        return false;
+        return match;
     });
 
-    if (filtered.length === 0) {
-        rArea.innerHTML = `<p style="color:#e63946; font-size:1.3em; text-align:center;">
-            暫時未找到完全符合的款式～<br>請截圖以上選擇，WhatsApp我們即時幫你查！
-        </p>`;
-        whatsapp.style.display = "block";
+    if (matched.length === 0) {
+        rArea.innerHTML = `
+            <div style="text-align:center; padding:30px; color:#666;">
+                <h3>😊 我們有相似產品推薦</h3>
+                <p>請截圖您的選擇並WhatsApp，我們專業顧問即時為您服務！</p>
+            </div>
+        `;
+        whatsappReminder.style.display = "block";
         return;
     }
 
-    filtered.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-            <div class="product-code">${p.category} ${p.code}</div>
-            <div>尺寸：${p.size}</div>
-            <div>顏色：${p.color}</div>
-            <div class="product-price">
-                <del>原價：$${p.originalPrice}</del><br>
-                折實價：<span style="color:#e63946; font-size:1.4em; font-weight:bold;">$${p.salePrice}</span>
+    const colorInfo = checkColorAvailability(matched, answers.color);
+
+    matched.slice(0, 8).forEach(p => {  // 只顯示前8款避免太長
+        const div = document.createElement("div");
+        div.className = "product-card";
+        const colorStatus = p.color.includes(answers.color) ? "✅ 原色免費" : "💰 +$500可改色";
+        div.innerHTML = `
+            <div class="category-tag">${p.category}</div>
+            <div class="product-code">${p.code}</div>
+            <div>尺寸: ${p.size}mm</div>
+            <div>顏色: ${p.color}</div>
+            <div style="font-size:0.9em; color:#666; line-height:1.4;">${p.note}</div>
+            <div style="margin-top:10px; padding:8px; background:#e8f5e8; border-radius:8px;">
+                ${colorStatus}
             </div>
-            <div>${p.note || ""}</div>
         `;
-        rArea.appendChild(card);
+        rArea.appendChild(div);
     });
 
-    whatsapp.style.display = "block";
+    if (matched.length > 8) {
+        const moreDiv = document.createElement("div");
+        moreDiv.style.cssText = "text-align:center; padding:20px; background:#f0f8ff; border-radius:10px; margin-top:15px;";
+        moreDiv.innerHTML = `... 還有${matched.length-8}款相似產品，<strong>請截圖聯絡我們獲取完整清單！</strong>`;
+        rArea.appendChild(moreDiv);
+    }
+
+    whatsappReminder.style.display = "block";
+}
+
+function checkColorAvailability(products, selectedColor) {
+    const allColors = ["ORI胡桃", "白木紋", "親橡", "橡木"];
+    const productColors = products.map(p => p.color.split(/[、，配]/)).flat().filter(c => allColors.includes(c.trim()));
+    const uniqueColors = [...new Set(productColors)];
+    
+    return {
+        freeColors: uniqueColors,
+        extraCostColors: selectedColor && !uniqueColors.includes(selectedColor) ? [selectedColor] : []
+    };
 }
 
 document.getElementById("restart").onclick = () => {
     answers = {};
-    currentStep = 0;
+    currentQuestionIndex = 0;
     showQuestion();
 };
 
-document.addEventListener("DOMContentLoaded", showQuestion);
+document.addEventListener("DOMContentLoaded", () => {
+    showQuestion();
+});
