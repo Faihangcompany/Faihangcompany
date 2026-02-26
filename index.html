@@ -1,55 +1,32 @@
-<!-- index.html - 替換整個檔案 -->
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>暉恒公司（北角紅蘋果）- 家具選購助手</title>
+    <title>紅蘋果傢俬 - 快速推薦</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>🌟 暉恒公司（北角紅蘋果）</h1>
-        <p>專業家具 • 香港製造 • 品質保證</p>
+        <h1>紅蘋果傢俬 - 幫你快速搵啱嘅傢俬！</h1>
+        <p>答幾條問題，即時推薦最啱你嘅選擇</p>
     </header>
 
-    <nav>
-        <a href="#finder" class="btn">找適合我的家具</a>
-        <a href="#catalog" class="btn">產品目錄</a>
-        <a href="#contact" class="btn">聯絡我們</a>
-    </nav>
-
-    <main>
-        <section id="finder">
-            <h2>🧠 智能家具選購助手</h2>
-            <div id="question-area"></div>
-            <div id="answers-area"></div>
-            <div id="results-area"></div>
-            <button id="restart" class="btn" style="display:none;">重新開始</button>
-            <div id="whatsapp-reminder" style="display:none;">
-                <p>📱 <strong>請截圖以上結果並WhatsApp我們：</strong></p>
-                <a href="https://wa.me/85253908976" class="btn">立即查詢 ➡️</a>
-            </div>
-        </section>
-
-        <section id="catalog">
-            <h2>📦 完整產品目錄</h2>
-            <div class="catalog-links">
-                <p>查看最新產品目錄和報價：</p>
-                <a href="https://linktr.ee/faihang_redapple" target="_blank" class="btn-primary">前往Linktree ➡️</a>
-            </div>
-        </section>
-
-        <section id="contact">
-            <h2>📱 立即聯絡</h2>
-            <div class="contact-info">
-                <p><strong>WhatsApp:</strong> <a href="https://wa.me/85253908976">5390 8976</a></p>
-                <p><strong>Instagram:</strong> <a href="https://www.instagram.com/faihang_redapple">@faihang_redapple</a></p>
-                <p><strong>地址:</strong> 北角紅蘋果門市</p>
-                <p>發送產品編號給我們，即刻報價！</p>
-            </div>
-        </section>
-    </main>
+    <section>
+        <h2 id="question-area"></h2>
+        <div id="answers-area"></div>
+        <div id="results-area"></div>
+        <button id="restart" class="btn">重新開始</button>
+        <div id="whatsapp-reminder" style="display:none;">
+            <p style="font-size:1.3em; color:#d35400;">
+                想知更多細節或有其他要求？<br>
+                即刻WhatsApp我們啦！<br>
+                <a href="https://wa.me/852你的號碼" target="_blank" style="color:#25D366; font-weight:bold; font-size:1.5em;">
+                    WhatsApp 查詢 →
+                </a>
+            </p>
+        </div>
+    </section>
 
     <script src="products.js"></script>
     <script src="app.js"></script>
