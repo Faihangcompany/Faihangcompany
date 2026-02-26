@@ -1,8 +1,8 @@
-// app.js - 替換整個檔案
+// app.js - 正確順序 + 4個顏色選項（替換整個檔案）
 const questions = [
     {key: "category", text: "想要哪種家具？", options: ["裝飾櫃", "餐邊櫃", "地櫃", "地櫃連上座"]},
-    {key: "color", text: "喜歡什麼顏色？", options: ["ORI胡桃", "白木紋", "親橡", "橡木"]},
-    {key: "priceRange", text: "預算範圍？", options: ["$1,000以下", "$1,000-$2,500", "$2,500以上"]}
+    {key: "priceRange", text: "預算範圍？", options: ["$1,000以下", "$1,000-$2,500", "$2,500以上"]},
+    {key: "color", text: "喜歡什麼顏色？", options: ["ORI胡桃", "白木紋", "親橡", "橡木"]}
 ];
 
 const availableColors = ["ORI胡桃", "白木紋", "親橡", "橡木"];
@@ -75,12 +75,12 @@ function showResults() {
     }
 
     // 顏色匹配檢查
-    const colorInfo = checkColorAvailability(matched, answers.color || "");
+    const colorInfo = checkColorAvailability(matched, answers.color);
 
     matched.forEach(p => {
         const div = document.createElement("div");
         div.className = "product-card";
-        const colorStatus = p.color.includes(answers.color || "") ? "✅ 原色" : colorInfo.extraCost ? "💰 +$500可改" : "❌ 不可改色";
+        const colorStatus = p.color.includes(answers.color) ? "✅ 原色" : "💰 +$500可改";
         div.innerHTML = `
             <div class="category-tag">${p.category}</div>
             <div class="product-code">${p.code}</div>
@@ -94,32 +94,29 @@ function showResults() {
         rArea.appendChild(div);
     });
 
-    // 顯示顏色資訊
-    if (colorInfo.extraCostColors.length > 0 || colorInfo.freeColors.length > 0) {
-        const infoDiv = document.createElement("div");
-        infoDiv.style.cssText = "margin-top:20px; padding:15px; background:#e3f2fd; border-radius:10px; border-left:4px solid #4ecdc4;";
-        infoDiv.innerHTML = `
-            <strong>顏色資訊：</strong><br>
-            ${colorInfo.freeColors.length > 0 ? `✅ 免費顏色：${colorInfo.freeColors.join('、')}` : ''}
-            ${colorInfo.extraCostColors.length > 0 ? `<br>💰 加$500可改：${colorInfo.extraCostColors.join('、')}` : ''}
-        `;
-        rArea.appendChild(infoDiv);
-    }
+    // 顏色資訊
+    const infoDiv = document.createElement("div");
+    infoDiv.style.cssText = "margin-top:20px; padding:15px; background:#e3f2fd; border-radius:10px; border-left:4px solid #4ecdc4;";
+    infoDiv.innerHTML = `
+        <strong>顏色資訊：</strong><br>
+        ✅ 免費顏色：${colorInfo.freeColors.join('、')}<br>
+        💰 加$500可改：${colorInfo.extraCostColors.join('、')}
+    `;
+    rArea.appendChild(infoDiv);
 
     whatsappReminder.style.display = "block";
 }
 
 function checkColorAvailability(products, selectedColor) {
-    const allColors = availableColors.filter(color => 
-        products.some(p => p.color.includes(color))
-    );
-    const freeColors = allColors.filter(color => color !== selectedColor);
-    const extraCostColors = selectedColor && !allColors.includes(selectedColor) ? [selectedColor] : [];
+    const productColors = products.map(p => p.color.split(/[、，]/)).flat();
+    const uniqueColors = [...new Set(productColors)].filter(c => availableColors.includes(c.trim()));
+    
+    const freeColors = uniqueColors.filter(c => c !== selectedColor);
+    const extraCostColors = selectedColor && !uniqueColors.includes(selectedColor) ? [selectedColor] : [];
     
     return {
-        freeColors,
-        extraCostColors,
-        extraCost: extraCostColors.length > 0
+        freeColors: freeColors.length > 0 ? freeColors : availableColors.slice(0,2), // 預設顯示常見顏色
+        extraCostColors: extraCostColors.length > 0 ? extraCostColors : availableColors.slice(2)
     };
 }
 
