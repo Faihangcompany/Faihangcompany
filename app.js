@@ -1,10 +1,11 @@
 import products from './products.js';
 
+// Global state
 let currentQuestionIndex = 0;
 let userAnswers = {};
 let selectedCategory = null;
 let filteredProducts = [];
-let activeQuestions = []; // To hold the merged list of questions
+let activeQuestions = [];
 
 const questions = {
     initial: [
@@ -29,8 +30,13 @@ const questions = {
     '衣櫃': [{ text: '您需要哪種門？', options: ['拉門', '趟門', '無偏好'], key: 'door_type' }]
 };
 
-function startQuestionnaire() {
-    console.log("Quiz Started");
+// Expose functions to window so HTML buttons can click them
+window.startQuestionnaire = function() {
+    // 1. Hide the loading status immediately
+    const status = document.getElementById('status');
+    if(status) status.style.display = 'none';
+    
+    console.log("Quiz Engine Started");
     filteredProducts = [...products];
     currentQuestionIndex = 0;
     userAnswers = {};
@@ -39,13 +45,12 @@ function startQuestionnaire() {
     document.getElementById('results').innerHTML = '';
     document.getElementById('whatsapp-reminder').style.display = 'none';
     document.getElementById('restart').style.display = 'none';
-    document.getElementById('status').style.display = 'none';
     
     askNextQuestion();
 }
 
 function askNextQuestion() {
-    if (currentQuestionIndex >= activeQuestions.length || filteredProducts.length <= 1) {
+    if (currentQuestionIndex >= activeQuestions.length || (currentQuestionIndex > 0 && filteredProducts.length <= 1)) {
         showResults();
         return;
     }
@@ -58,17 +63,20 @@ function askNextQuestion() {
     question.options.forEach(option => {
         const btn = document.createElement('button');
         btn.innerText = option;
-        btn.className = 'btn-option'; // Add a class for styling
-        btn.onclick = () => handleAnswer(question.key, option);
+        btn.className = 'btn'; // Use your existing CSS class
+        btn.style.margin = "5px";
+        btn.onclick = () => window.handleAnswer(question.key, option);
         optionsContainer.appendChild(btn);
     });
 }
 
-function handleAnswer(key, value) {
+window.handleAnswer = function(key, value) {
+    console.log(`Answered ${key}: ${value}`);
+    
     if (key === 'category') {
         selectedCategory = value;
         filteredProducts = filteredProducts.filter(p => p.category === value);
-        // MERGE: Category Specific + Common questions
+        // Add specific questions then common questions
         activeQuestions = activeQuestions.concat(questions[selectedCategory] || [], questions.common);
     } else {
         userAnswers[key] = value;
@@ -84,14 +92,16 @@ function applyFilters(key, value) {
 
     if (key === 'budget') {
         filteredProducts = filteredProducts.filter(p => {
-            if (value === '低於1000') return p.salePrice < 1000;
-            if (value === '1000-2000') return p.salePrice >= 1000 && p.salePrice <= 2000;
-            if (value === '2000-3000') return p.salePrice >= 2000 && p.salePrice <= 3000;
-            if (value === '3000以上') return p.salePrice > 3000;
+            const price = parseFloat(p.salePrice);
+            if (value === '低於1000') return price < 1000;
+            if (value === '1000-2000') return price >= 1000 && price <= 2000;
+            if (value === '2000-3000') return price >= 2000 && price <= 3000;
+            if (value === '3000以上') return price > 3000;
             return true;
         });
     } else if (key === 'width') {
         filteredProducts = filteredProducts.filter(p => {
+            if (!p.size) return true;
             const width = parseInt(p.size.split('*')[0]);
             if (value === '小於800') return width < 800;
             if (value === '800-1200') return width >= 800 && width <= 1200;
@@ -100,45 +110,46 @@ function applyFilters(key, value) {
             return true;
         });
     } else {
-        // Matches color, bed_type, etc.
         filteredProducts = filteredProducts.filter(p => 
-            (p[key] && p[key].includes(value)) || p[key] === value
+            (p[key] && String(p[key]).includes(value)) || p[key] === value
         );
     }
 }
 
 function showResults() {
-    document.getElementById('question').innerText = "為您推薦的最佳家具：";
+    document.getElementById('question').innerText = "為您推薦的家具：";
     document.getElementById('options').innerHTML = '';
     const resultsContainer = document.getElementById('results');
     
     if (filteredProducts.length === 0) {
         resultsContainer.innerHTML = "<p>抱歉，沒有找到完全符合的產品。請嘗試重新選擇或直接聯絡我們！</p>";
     } else {
-        // Show Top 3 results
-        filteredProducts.slice(0, 3).forEach(product => {
+        filteredProducts.slice(0, 5).forEach(product => {
             const card = document.createElement('div');
-            card.className = 'product-card';
+            card.style.border = "1px solid #ddd";
+            card.style.padding = "15px";
+            card.style.margin = "10px 0";
+            card.style.borderRadius = "8px";
             card.innerHTML = `
-                <h3>${product.code} - ${product.category}</h3>
-                <p><strong>尺寸:</strong> ${product.size}</p>
-                <p><strong>顏色:</strong> ${product.color}</p>
-                <p><strong>特價:</strong> <span style="color:red; font-size:1.2em;">HK$${product.salePrice}</span></p>
-                <button class="btn-whatsapp" onclick="sendWhatsApp('${product.code}')">詢問此型號報價</button>
+                <h3>${product.code}</h3>
+                <p>類別: ${product.category} | 尺寸: ${product.size}</p>
+                <p>顏色: ${product.color}</p>
+                <p style="color:red; font-weight:bold;">特價: HK$${product.salePrice}</p>
+                <button class="btn" onclick="window.sendWhatsApp('${product.code}')">詢問此型號</button>
             `;
             resultsContainer.appendChild(card);
         });
     }
 
-    document.getElementById('restart').style.display = 'block';
+    document.getElementById('restart').style.display = 'inline-block';
     document.getElementById('restart').onclick = () => location.reload();
     document.getElementById('whatsapp-reminder').style.display = 'block';
 }
 
-// Global function for the buttons
 window.sendWhatsApp = function(productCode) {
-    const msg = `您好！我在智能助手找到喜歡的家具：\n編號: ${productCode}\n請提供更多資訊或報價。`;
+    const msg = `您好！我在暉恒智能助手看到感興趣的家具：\n編號: ${productCode}\n請提供更多資訊。`;
     window.open(`https://wa.me/85253908976?text=${encodeURIComponent(msg)}`);
 }
 
-document.addEventListener('DOMContentLoaded', startQuestionnaire);
+// Start everything
+document.addEventListener('DOMContentLoaded', window.startQuestionnaire);
