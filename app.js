@@ -17,7 +17,7 @@ const questions = {
     ],
     common: [
         { text: '您的預算大約是多少？', options: ['低於1000', '1000-2000', '2000-3000', '3000以上'], key: 'budget' },
-        { text: '您喜歡哪種顏色？', options: ['ORI胡桃', '親橡', '白木紋', '橡木', '其他/無偏好'], key: 'color' },
+        { text: '您喜歡哪種顏色？', options: ['ORI胡桃', '親橡', '白木紋', '橡木', '無偏好'], key: 'color' },
         { text: '您需要多大的尺寸（寬度mm）？', options: ['小於800', '800-1200', '1200-1500', '1500以上'], key: 'width' }
     ],
     '桶櫃': [{ text: '您需要幾桶？', options: ['四桶櫃', '五桶櫃', '無偏好'], key: 'bucket_count' }],
