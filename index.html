@@ -19,16 +19,23 @@
     </nav>
 
     <main>
-        <section id="finder">
-            <h2>🧠 智能家具選購助手</h2>
-            <div id="question"></div>
-            <div id="options"></div>
-            <div id="results"></div>
-            <p id="status" style="color: #666; font-style: italic;">載入問卷中，請稍候...</p> <!-- Temporary loading text -->
+    <section id="finder">
+        <h2>🧠 智能家具選購助手</h2>
+        <!-- The JavaScript looks for these IDs below -->
+        <p id="status" style="color: #666; font-style: italic;">載入問卷中，請稍候...</p> 
+    
+        <div id="question"></div>
+        <div id="options"></div>
+        <div id="results"></div>
 
-            <button id="restart" class="btn" style="display:none;">重新開始</button>
+        <button id="restart" class="btn" style="display:none;">重新開始</button>
 
-        </section>
+        <div id="whatsapp-reminder" style="display:none;">
+            <p>📱 <strong>請截圖結果並WhatsApp我們：</strong></p>
+            <a href="https://wa.me/85253908976" class="btn" style="background-color: #25D366; color: white;">立即查詢 ➡️</a>
+        </div>
+    </section>
+
 
         <!-- Catalog and Contact sections unchanged -->
         <section id="catalog">
