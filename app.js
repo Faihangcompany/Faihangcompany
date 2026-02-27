@@ -1,5 +1,6 @@
 import products from './products.js';
-
+console.log("app.js LOADED successfully!");
+console.log("Products imported:", products.length);  // Should print ~83
 // Global state
 let currentQuestionIndex = 0;
 let userAnswers = {};
@@ -183,3 +184,4 @@ function showResults() {
 
 // Init (call on page load)
 document.addEventListener('DOMContentLoaded', startQuestionnaire);
+console.log("Questionnaire init started");
