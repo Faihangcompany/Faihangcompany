@@ -28,30 +28,44 @@ window.initQuiz = function() {
     document.getElementById('status').style.display = 'none';
     document.getElementById('results').innerHTML = '';
     document.getElementById('whatsapp-reminder').style.display = 'none';
-    document.getElementById('restart').style.display = 'none';
+    const restartBtn = document.getElementById('restart');
+    if (restartBtn) restartBtn.style.display = 'none';
 
     // 初始模式選擇
     selectedMode = null;
     const qEl = document.getElementById('question');
     const oEl = document.getElementById('options');
-    qEl.innerText = "歡迎來到暉恒助手，請問您今天想找什麼？";
+    
+    qEl.innerHTML = "<span style='font-size: 1.2em; font-weight: bold;'>歡迎來到暉恒助手<br>請問您今天想找什麼？</span>";
     oEl.innerHTML = '';
 
+    // --- BUTTON 1: FURNITURE ---
     const btn1 = document.createElement('button');
-    btn1.innerText = "🏢 找優質家具";
+    btn1.innerHTML = "<span style='font-size: 1.5em;'>🏢</span><br>找優質家具";
     btn1.className = 'btn';
-    btn1.style.margin = "10px";
+    btn1.style.width = "90%";            // Make it wide
+    btn1.style.padding = "25px 10px";    // Make it tall
+    btn1.style.margin = "15px auto";     // Space between buttons
+    btn1.style.fontSize = "1.2em";       // Larger text
+    btn1.style.display = "block";        // Stack them vertically
     btn1.onclick = () => startMode('furniture');
 
+    // --- BUTTON 2: MATTRESS ---
     const btn2 = document.createElement('button');
-    btn2.innerText = "🛏️ 找歐化寶床褥";
+    btn2.innerHTML = "<span style='font-size: 1.5em;'>🛏️</span><br>找歐化寶床褥";
     btn2.className = 'btn';
-    btn2.style.margin = "10px";
+    btn2.style.width = "90%";
+    btn2.style.padding = "25px 10px";
+    btn2.style.margin = "15px auto";
+    btn2.style.fontSize = "1.2em";
+    btn2.style.display = "block";
+    btn2.style.backgroundColor = "#004a99"; // Blue for mattress
     btn2.onclick = () => startMode('mattress');
 
     oEl.appendChild(btn1);
     oEl.appendChild(btn2);
 };
+
 
 function startMode(mode) {
     selectedMode = mode;
