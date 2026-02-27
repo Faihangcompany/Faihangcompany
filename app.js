@@ -1,11 +1,13 @@
 import products from './products.js';
 
+console.log("Faihang App: Script loaded");
+console.log("Faihang App: Products loaded count:", products ? products.length : "ERROR");
+
 // Global state
 let currentQuestionIndex = 0;
-let userAnswers = {};
-let selectedCategory = null;
 let filteredProducts = [];
 let activeQuestions = [];
+let selectedCategory = null;
 
 const questions = {
     initial: [
@@ -31,70 +33,50 @@ const questions = {
     '衣櫃': [{ text: '您需要哪種門？', options: ['拉門', '趟門', '無偏好'], key: 'door_type' }]
 };
 
-// 1. Initialize Questionnaire
-window.initQuiz = function() {
-    console.log("Quiz initializing...");
-    // Hide loading text
-    const statusEl = document.getElementById('status');
-    if (statusEl) statusEl.style.display = 'none';
+// --- CORE FUNCTIONS ---
 
-    filteredProducts = [...products];
-    currentQuestionIndex = 0;
-    userAnswers = {};
-    activeQuestions = [...questions.initial];
-    
-    document.getElementById('results').innerHTML = '';
-    document.getElementById('whatsapp-reminder').style.display = 'none';
-    document.getElementById('restart').style.display = 'none';
-    
-    askNextQuestion();
-};
-
-// 2. Ask Next Question
-function askNextQuestion() {
+window.renderQuestion = function() {
     const questionContainer = document.getElementById('question');
     const optionsContainer = document.getElementById('options');
+    const statusEl = document.getElementById('status');
 
-    // If no more questions or filtered down to a few products, show results
+    if (statusEl) statusEl.style.display = 'none';
+
     if (currentQuestionIndex >= activeQuestions.length || (currentQuestionIndex > 0 && filteredProducts.length <= 2)) {
         showResults();
         return;
     }
 
-    const question = activeQuestions[currentQuestionIndex];
-    questionContainer.innerText = question.text;
+    const currentQ = activeQuestions[currentQuestionIndex];
+    questionContainer.innerText = currentQ.text;
     optionsContainer.innerHTML = '';
 
-    question.options.forEach(option => {
+    currentQ.options.forEach(opt => {
         const btn = document.createElement('button');
-        btn.innerText = option;
-        btn.className = 'btn'; 
-        btn.style.margin = "5px";
-        // CRITICAL: Attach to window so onclick finds it
-        btn.onclick = () => window.handleAnswer(question.key, option);
+        btn.innerText = opt;
+        btn.className = 'btn';
+        btn.style.margin = "8px";
+        btn.style.padding = "12px 20px";
+        btn.onclick = () => window.handleSelection(currentQ.key, opt);
         optionsContainer.appendChild(btn);
     });
-}
+};
 
-// 3. Handle Answers
-window.handleAnswer = function(key, value) {
-    console.log(`Filtering by ${key}: ${value}`);
+window.handleSelection = function(key, value) {
+    console.log("Selected:", key, "->", value);
     
     if (key === 'category') {
         selectedCategory = value;
         filteredProducts = products.filter(p => p.category === value);
-        // Build the rest of the question path
         activeQuestions = [...questions.initial, ...(questions[selectedCategory] || []), ...questions.common];
     } else {
-        userAnswers[key] = value;
         applyFilters(key, value);
     }
 
     currentQuestionIndex++;
-    askNextQuestion();
+    window.renderQuestion();
 };
 
-// 4. Filter Logic
 function applyFilters(key, value) {
     if (value === '無偏好' || value === '其他/無偏好') return;
 
@@ -110,59 +92,56 @@ function applyFilters(key, value) {
     } else if (key === 'width') {
         filteredProducts = filteredProducts.filter(p => {
             if (!p.size) return true;
-            const width = parseInt(p.size.split('*')[0]);
-            if (value === '小於800') return width < 800;
-            if (value === '800-1200') return width >= 800 && width <= 1200;
-            if (value === '1200-1500') return width >= 1200 && width <= 1500;
-            if (value === '1500以上') return width > 1500;
+            const w = parseInt(p.size.split('*')[0]);
+            if (value === '小於800') return w < 800;
+            if (value === '800-1200') return w >= 800 && w <= 1200;
+            if (value === '1200-1500') return w >= 1200 && w <= 1500;
+            if (value === '1500以上') return w > 1500;
             return true;
         });
     } else {
-        // Matches color, bed_type, headboard_leather, door_type, etc.
         filteredProducts = filteredProducts.filter(p => {
-            if (!p[key]) return false; 
+            if (!p[key]) return false;
             return String(p[key]).includes(value);
         });
     }
 }
 
-// 5. Show Final Results
 function showResults() {
-    document.getElementById('question').innerText = filteredProducts.length > 0 ? "為您挑選的建議產品：" : "沒有找到完全符合的產品";
+    document.getElementById('question').innerText = "為您推薦：";
     document.getElementById('options').innerHTML = '';
     const resultsContainer = document.getElementById('results');
     
-    filteredProducts.slice(0, 6).forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.style.border = "1px solid #d4a373";
-        card.style.padding = "15px";
-        card.style.margin = "10px 0";
-        card.style.borderRadius = "10px";
-        card.style.textAlign = "left";
-        
-        card.innerHTML = `
-            <h3 style="margin-top:0;">型號: ${product.code}</h3>
-            <p><strong>尺寸:</strong> ${product.size}</p>
-            <p><strong>顏色:</strong> ${product.color}</p>
-            <p style="color:#b00; font-size:1.1em;"><strong>優惠價: HK$${product.salePrice}</strong></p>
-            <button class="btn" style="background:#25D366; color:white; border:none;" onclick="window.sendWhatsApp('${product.code}')">WhatsApp 查詢報價</button>
-        `;
-        resultsContainer.appendChild(card);
-    });
-
+    if (filteredProducts.length === 0) {
+        resultsContainer.innerHTML = "<p>抱歉，暫時沒有符合您的選擇。請點擊重新開始或聯絡我們。</p>";
+    } else {
+        filteredProducts.slice(0, 4).forEach(p => {
+            const card = document.createElement('div');
+            card.style.border = "2px solid #d4a373";
+            card.style.padding = "15px";
+            card.style.margin = "10px 0";
+            card.style.borderRadius = "10px";
+            card.innerHTML = `
+                <h3 style="margin:0">型號: ${p.code}</h3>
+                <p>尺寸: ${p.size} | 顏色: ${p.color}</p>
+                <p style="color:#b00; font-size:1.2em;"><b>特價: HK$${p.salePrice}</b></p>
+                <button class="btn" style="background:#25D366; color:white; border:none;" onclick="window.sendWhatsApp('${p.code}')">詢問詳情</button>
+            `;
+            resultsContainer.appendChild(card);
+        });
+    }
     document.getElementById('restart').style.display = 'inline-block';
     document.getElementById('whatsapp-reminder').style.display = 'block';
 }
 
 window.sendWhatsApp = function(code) {
-    const msg = `您好！我在暉恒智能助手看中這款家具：\n型號: ${code}\n請提供更多資訊，謝謝！`;
-    window.open(`https://wa.me/85253908976?text=${encodeURIComponent(msg)}`);
+    const msg = encodeURIComponent(`您好！我在暉恒助手看中這款家具：\n型號: ${code}\n請提供更多資訊。`);
+    window.open(`https://wa.me/85253908976?text=${msg}`);
 };
 
-// Auto-start on load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', window.initQuiz);
-} else {
-    window.initQuiz();
-}
+// START ON LOAD
+window.onload = function() {
+    filteredProducts = [...products];
+    activeQuestions = [...questions.initial];
+    window.renderQuestion();
+};
