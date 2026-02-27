@@ -45,3 +45,35 @@ h2 {color: #333; margin-bottom: 25px; font-size: 1.8em; text-align: center;}
 .catalog-links {text-align: center;}
 .catalog-links p {font-size: 1.2em; margin-bottom: 20px;}
 @media (max-width: 768px) {body {padding: 10px;} nav {flex-direction: column; align-items: center;} section {padding: 20px;} header h1 {font-size: 1.8em;}}
+.btn-option {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    padding: 12px;
+    background: #fff;
+    border: 2px solid #d4a373;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.btn-option:hover { background: #d4a373; color: white; }
+
+.product-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.btn-whatsapp {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
