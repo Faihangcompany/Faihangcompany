@@ -9,7 +9,7 @@ let activeQuestions = [];
 const questions = {
     initial: [{ text: '您想找哪種家具類別？', options: ['裝飾櫃', '餐邊櫃', '地櫃', '電視櫃', '茶幾', '桶櫃', '鞋櫃', '床頭櫃', '妝臺', '書桌', '書櫃', '床', '衣櫃'], key: 'category' }],
     common: [
-        { text: '您的預算大約是多少？', options: ['低於1500', '1500-3000', '3000-4500', '4500以上'], key: 'budget' },
+        // REMOVED BUDGET QUESTION AS REQUESTED
         { text: '您喜歡哪種顏色？', options: ['ORI胡桃', '親橡', '白木紋', '橡木', '無偏好'], key: 'color' },
         { text: '您需要多大的尺寸（寬度mm）？', options: ['小於800', '800-1200', '1200-1500', '1500以上'], key: 'width' }
     ],
@@ -24,18 +24,15 @@ const questions = {
     '衣櫃': [{ text: '您需要哪種門？', options: ['拉門', '趟門', '無偏好'], key: 'door_type' }]
 };
 
+// --- CORE LOGIC ---
+
 window.initQuiz = function() {
-    console.log("Quiz initializing...");
+    console.log("Restarting Quiz...");
     
-    // Safety check: Hide loading status only if it exists
+    // UI Resets
     const statusEl = document.getElementById('status');
     if (statusEl) statusEl.style.display = 'none';
 
-    filteredProducts = [...products];
-    currentQuestionIndex = 0;
-    userAnswers = {};
-    activeQuestions = [...questions.initial];
-    
     const resEl = document.getElementById('results');
     if (resEl) resEl.innerHTML = '';
     
@@ -43,10 +40,13 @@ window.initQuiz = function() {
     if (reminderEl) reminderEl.style.display = 'none';
     
     const restartBtn = document.getElementById('restart');
-    if (restartBtn) {
-        restartBtn.style.display = 'none';
-        restartBtn.onclick = () => window.initQuiz();
-    }
+    if (restartBtn) restartBtn.style.display = 'none';
+
+    // Logic Resets
+    filteredProducts = [...products];
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    activeQuestions = [...questions.initial];
     
     askNextQuestion();
 };
@@ -57,7 +57,7 @@ function askNextQuestion() {
 
     if (!questionEl || !optionsEl) return;
 
-    if (currentQuestionIndex >= activeQuestions.length || (currentQuestionIndex > 0 && filteredProducts.length <= 2)) {
+    if (currentQuestionIndex >= activeQuestions.length || (currentQuestionIndex > 0 && filteredProducts.length <= 1)) {
         showResults();
         return;
     }
@@ -91,16 +91,8 @@ window.handleAnswer = function(key, value) {
 
 function applyFilters(key, value) {
     if (value === '無偏好' || value === '其他/無偏好') return;
-    if (key === 'budget') {
-        filteredProducts = filteredProducts.filter(p => {
-            const price = p.salePrice;
-            if (value === '低於1500') return price < 1500;
-            if (value === '1500-3000') return price >= 1500 && price <= 3000;
-            if (value === '3000-4500') return price >= 3000 && price <= 4500;
-            if (value === '4500以上') return price > 4500;
-            return true;
-        });
-    } else if (key === 'width') {
+    
+    if (key === 'width') {
         filteredProducts = filteredProducts.filter(p => {
             if (!p.size) return true;
             const width = parseInt(p.size.split('*')[0]);
@@ -111,6 +103,7 @@ function applyFilters(key, value) {
             return true;
         });
     } else {
+        // Handle color, bed_type, etc.
         filteredProducts = filteredProducts.filter(p => p[key] && String(p[key]).includes(value));
     }
 }
@@ -131,28 +124,36 @@ function showResults() {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.style.border = "1px solid #d4a373";
-            card.style.padding = "10px";
-            card.style.margin = "10px 0";
-            card.style.borderRadius = "8px";
+            card.style.padding = "15px";
+            card.style.margin = "15px 0";
+            card.style.borderRadius = "10px";
+            card.style.backgroundColor = "#fff";
+            
+            // Apply your requested changes here:
             card.innerHTML = `
-                <h4>型號: ${p.code}</h4>
-                <p>尺寸: ${p.size} | 顏色: ${p.color}</p>
-                <p style="color:red;"><b>特價: HK$${p.salePrice}</b></p>
-                <button class="btn" onclick="window.sendWhatsApp('${p.code}')">WhatsApp 查詢</button>
+                <h4 style="margin-top:0; color:#d4a373;">型號: ${p.code}</h4>
+                <p><strong>尺寸:</strong> ${p.size}</p>
+                <p><strong>顏色:</strong> ${p.color}</p>
+                <p style="color:#666; font-size:0.9em; background:#f9f9f9; padding:5px;">💡 溫馨提示：可加 HK$500 改選其他顏色</p>
+                <p><strong>備註:</strong> ${p.note || '無'}</p>
+                <button class="btn" style="background-color:#25D366; color:white; width:100%;" onclick="window.sendWhatsApp('${p.code}')">查詢價錢</button>
             `;
             rEl.appendChild(card);
         });
     }
 
     const rBtn = document.getElementById('restart');
-    if (rBtn) rBtn.style.display = 'inline-block';
+    if (rBtn) {
+        rBtn.style.display = 'inline-block';
+        rBtn.onclick = () => window.initQuiz(); // Fix for restart logic
+    }
     
     const wRem = document.getElementById('whatsapp-reminder');
     if (wRem) wRem.style.display = 'block';
 }
 
 window.sendWhatsApp = function(code) {
-    const msg = `您好！我在暉恒智能助手看中這款家具：\n型號: ${code}\n請提供更多資訊。`;
+    const msg = `您好！我在暉恒智能助手看中這款家具：\n型號: ${code}\n想查詢具體價錢及詳情。`;
     window.open(`https://wa.me/85253908976?text=${encodeURIComponent(msg)}`);
 };
 
