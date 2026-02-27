@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css - 已修復重疊問題並放大 Logo */
 * {margin: 0; padding: 0; box-sizing: border-box;}
 
 body {
@@ -7,12 +7,12 @@ body {
     max-width: 1200px; margin: 0 auto;
     padding: 20px; 
     
-    /* Background Logo Watermark */
+    /* 這裡將 Logo 放大 3 倍以上 (從 350px 改為 1000px) */
     background-image: url('logo.png');
     background-repeat: no-repeat;
-    background-position: center 30%;
+    background-position: center 40%;
     background-attachment: fixed;
-    background-size: 350px;
+    background-size: 1000px; 
     background-color: #f5f7fa;
 }
 
@@ -25,9 +25,10 @@ header {
 header h1 {font-size: 2.2em; color: #764ba2; margin-bottom: 10px;}
 
 section {
-    background: rgba(255, 255, 255, 0.85); /* Transparent white */
-    backdrop-filter: blur(8px);            /* Frosted glass effect */
-    padding: 40px; 
+    /* 增加白色背景的不透明度至 0.9，確保大 Logo 不會影響閱讀 */
+    background: rgba(255, 255, 255, 0.92); 
+    backdrop-filter: blur(10px);
+    padding: 30px; 
     margin-bottom: 30px; 
     border-radius: 20px; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -37,7 +38,7 @@ section {
     font-size: 1.4em; 
     font-weight: bold; 
     color: #4ecdc4; 
-    margin-bottom: 30px; 
+    margin-bottom: 25px; 
     text-align: center;
 }
 
@@ -46,55 +47,76 @@ section {
     flex-wrap: wrap; 
     gap: 15px; 
     justify-content: center; 
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
-/* Base button style from your CSS */
+/* 按鈕樣式 */
 .btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
     color: white; 
     border: none; 
-    padding: 15px 30px; 
+    padding: 15px 25px; 
     font-size: 1.1em; 
-    border-radius: 15px; 
+    border-radius: 12px; 
     cursor: pointer; 
     transition: all 0.3s; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
     font-weight: bold;
     text-align: center;
 }
 
 .btn:hover {
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
 
+/* 修復重疊問題：產品卡片 */
 .product-card {
     background: white; 
     border: 2px solid #e9ecef; 
     border-radius: 15px; 
-    padding: 25px; 
+    padding: 20px; 
     margin-bottom: 20px; 
-    transition: all 0.3s;
+    display: flex;           /* 使用 Flexbox 確保垂直排列 */
+    flex-direction: column;  /* 垂直排列內容 */
+    gap: 10px;               /* 內容之間的間距 */
+    height: auto;            /* 確保高度根據內容自動增加 */
+    min-height: 150px;       /* 設定最小高度 */
 }
 
-.product-card:hover {
-    border-color: #4ecdc4; 
-    box-shadow: 0 10px 30px rgba(78,205,196,0.3);
+.product-code {
+    font-size: 1.4em; 
+    font-weight: bold; 
+    color: #ff6b6b; 
+    margin-bottom: 5px;
 }
 
-.product-code {font-size: 1.5em; font-weight: bold; color: #ff6b6b; margin-bottom: 10px;}
+/* 備註與詳細資訊的文字樣式 */
+.product-card p {
+    margin-bottom: 5px;
+    word-break: break-all;   /* 防止長文字超出邊框 */
+}
+
+/* 查詢按鈕：確保它始終位於卡片底部且不重疊 */
+.wa-query-btn {
+    background: #25D366 !important; 
+    width: 100%; 
+    margin-top: 15px; 
+    padding: 12px;
+}
 
 #whatsapp-reminder {
     background: #fff3cd; 
     border: 2px solid #ffeaa7; 
     border-radius: 15px; 
-    padding: 20px; 
+    padding: 25px; 
     margin-top: 20px; 
     text-align: center;
 }
 
+/* 響應式調整 */
 @media (max-width: 768px) {
-    section {padding: 20px;}
-    header h1 {font-size: 1.8em;}
+    body { background-size: 600px; } /* 手機上縮小 Logo 免得擋住全部 */
+    section { padding: 15px; }
+    header h1 { font-size: 1.6em; }
 }
