@@ -176,7 +176,7 @@ const products = [
     "color": "白木紋",
     "original_price_hkd": 4900,
     "salePrice": 4165,
-    "note": "鋁腳高度90mm，鋁腳、鋁框和烤漆拉手顏色為香檳金。",
+    "note": "可放42寸電視，鋁腳高度90mm，鋁腳、鋁框和烤漆拉手顏色為香檳金。",
     "mattress_size_mm": null
   },
   {
