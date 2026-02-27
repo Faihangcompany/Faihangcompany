@@ -22,7 +22,7 @@ const mattresses = [
   {
     "brand": "歐化寶 Ulfenbo",
     "name": "Diamond IPC 星鑽 獨立袋裝彈簧床褥",
-    "hardness_desc": "偏硬",
+    "hardness_desc": "適中偏硬",
     "hardness_value": 4.5,
     "thickness": 10,
     "gift": "指定單人送記憶枕/甜睡枕1個；雙人送羊毛被/冷暖被1張或記憶枕/甜睡枕2個。",
@@ -32,7 +32,7 @@ const mattresses = [
   {
     "brand": "歐化寶 Ulfenbo",
     "name": "天絲寶 健脊床褥",
-    "hardness_desc": "偏硬",
+    "hardness_desc": "適中偏硬",
     "hardness_value": 5.3,
     "thickness": 6.5,
     "gift": "指定單人送記憶枕/甜睡枕1個；雙人送羊毛被/冷暖被1張或記憶枕/甜睡枕2個。",
@@ -42,7 +42,7 @@ const mattresses = [
   {
     "brand": "歐化寶 Ulfenbo",
     "name": "薄裝護脊 床褥",
-    "hardness_desc": "偏硬",
+    "hardness_desc": "適中偏硬",
     "hardness_value": 5,
     "thickness": 5.5,
     "gift": "指定單人送記憶枕/甜睡枕1個；雙人送羊毛被/冷暖被1張或記憶枕/甜睡枕2個。",
