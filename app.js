@@ -22,7 +22,7 @@ const furnitureQuestions = {
 };
 
 const mattressQuestions = [
-    { text: '您偏好的床褥軟硬度？', options: ['硬', '偏硬', '適中', '無偏好'], key: 'hardness_desc' },
+    { text: '您偏好的床褥軟硬度？', options: ['硬', '適中偏硬', '適中', '無偏好'], key: 'hardness_desc' },
     { text: '您對床褥厚度有要求嗎？', options: ['薄裝 (5.5吋或以下)', '標準 (6吋-9吋)', '厚裝 (9.5吋或以上)', '無偏好'], key: 'thickness_range' }
 ];
 
@@ -41,7 +41,7 @@ window.initQuiz = function() {
 
     // --- LARGE MODE SELECTION BUTTONS ---
     const btn1 = document.createElement('button');
-    btn1.innerHTML = "<span style='font-size: 2em;'>🏢</span><br>找優質家具";
+    btn1.innerHTML = "<span style='font-size: 2em;'>🏢</span><br>找紅蘋果家具";
     btn1.className = 'btn';
     btn1.style.width = "100%"; 
     btn1.style.padding = "40px 10px"; 
