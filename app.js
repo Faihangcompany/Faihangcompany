@@ -2,7 +2,7 @@ import products from './products.js';
 import mattresses from './mattresses.js';
 
 let currentQuestionIndex = 0;
-let selectedMode = null; // 'furniture' 或 'mattress'
+let selectedMode = null; // 'furniture' or 'mattress'
 let selectedCategory = null;
 let filteredProducts = [];
 let activeQuestions = [];
@@ -13,7 +13,10 @@ const furnitureQuestions = {
     '桶櫃': [{ text: '您需要幾桶？', options: ['四桶櫃', '五桶櫃', '無偏好'], key: 'bucket_count' }],
     '鞋櫃': [{ text: '您需要高身還是矮身？', options: ['高身', '矮身', '無偏好'], key: 'height_type' }],
     '書桌': [{ text: '需要連書架嗎？', options: ['連書架', '無書架', '無偏好'], key: 'with_bookshelf' }],
-    '床': [{ text: '您需要哪種床款？', options: ['碌架床', '無底床', '油壓床', '三櫃桶床', '無偏好'], key: 'bed_type' }, { text: '床墊尺寸需要多大？', options: ['三尺', '四尺', '四尺半', '五尺', '無偏好'], key: 'mattress_size_mm' }],
+    '床': [
+        { text: '您需要哪種床款？', options: ['碌架床', '無底床', '油壓床', '三櫃桶床', '無偏好'], key: 'bed_type' }, 
+        { text: '床墊尺寸需要多大？', options: ['三尺', '四尺', '四尺半', '五尺', '無偏好'], key: 'mattress_size_mm' }
+    ],
     '衣櫃': [{ text: '您需要哪種門？', options: ['拉門', '趟門', '無偏好'], key: 'door_type' }],
     sizeWidth: { text: '您需要多大的尺寸（寬度mm）？', options: ['小於800', '800-1200', '1200-1500', '1500以上', '無偏好'], key: 'width' }
 };
@@ -24,48 +27,39 @@ const mattressQuestions = [
 ];
 
 window.initQuiz = function() {
-    // UI Reset
+    // Reset UI
     document.getElementById('status').style.display = 'none';
     document.getElementById('results').innerHTML = '';
     document.getElementById('whatsapp-reminder').style.display = 'none';
-    const restartBtn = document.getElementById('restart');
-    if (restartBtn) restartBtn.style.display = 'none';
+    document.getElementById('restart').style.display = 'none';
 
-    // 初始模式選擇
-    selectedMode = null;
     const qEl = document.getElementById('question');
     const oEl = document.getElementById('options');
     
-    qEl.innerHTML = "<span style='font-size: 1.2em; font-weight: bold;'>歡迎來到暉恒助手<br>請問您今天想找什麼？</span>";
+    qEl.innerHTML = "歡迎來到暉恒助手<br>請問您今天想找什麼？";
     oEl.innerHTML = '';
 
-    // --- BUTTON 1: FURNITURE ---
+    // --- LARGE MODE SELECTION BUTTONS ---
     const btn1 = document.createElement('button');
-    btn1.innerHTML = "<span style='font-size: 1.5em;'>🏢</span><br>找優質家具";
+    btn1.innerHTML = "<span style='font-size: 2em;'>🏢</span><br>找優質家具";
     btn1.className = 'btn';
-    btn1.style.width = "90%";            // Make it wide
-    btn1.style.padding = "25px 10px";    // Make it tall
-    btn1.style.margin = "15px auto";     // Space between buttons
-    btn1.style.fontSize = "1.2em";       // Larger text
-    btn1.style.display = "block";        // Stack them vertically
+    btn1.style.width = "100%"; 
+    btn1.style.padding = "40px 10px"; 
+    btn1.style.margin = "15px 0";
     btn1.onclick = () => startMode('furniture');
 
-    // --- BUTTON 2: MATTRESS ---
     const btn2 = document.createElement('button');
-    btn2.innerHTML = "<span style='font-size: 1.5em;'>🛏️</span><br>找歐化寶床褥";
+    btn2.innerHTML = "<span style='font-size: 2em;'>🛏️</span><br>找歐化寶床褥";
     btn2.className = 'btn';
-    btn2.style.width = "90%";
-    btn2.style.padding = "25px 10px";
-    btn2.style.margin = "15px auto";
-    btn2.style.fontSize = "1.2em";
-    btn2.style.display = "block";
-    btn2.style.backgroundColor = "#004a99"; // Blue for mattress
+    btn2.style.width = "100%"; 
+    btn2.style.padding = "40px 10px"; 
+    btn2.style.margin = "15px 0";
+    btn2.style.background = "#004a99"; // Blue for mattresses
     btn2.onclick = () => startMode('mattress');
 
     oEl.appendChild(btn1);
     oEl.appendChild(btn2);
 };
-
 
 function startMode(mode) {
     selectedMode = mode;
@@ -113,35 +107,55 @@ function handleAnswer(key, value) {
     askNextQuestion();
 }
 
-// --- 家具邏輯 (保留你原本的所有規則) ---
+// --- FURNITURE LOGIC ---
 function handleFurnitureAnswer(key, value) {
     if (key === 'category') {
         selectedCategory = value;
         filteredProducts = products.filter(p => p.category === value);
         let branch = furnitureQuestions[selectedCategory] || [];
+        
+        // Custom Category Branches
         if (selectedCategory === '床頭櫃') branch = [];
-        if (!['床', '床頭櫃', '桶櫃'].includes(selectedCategory)) branch.push(furnitureQuestions.sizeWidth);
+        
+        // Add size question for specific categories
+        const skipSize = ['床', '床頭櫃', '桶櫃'];
+        if (!skipSize.includes(selectedCategory)) {
+            branch.push(furnitureQuestions.sizeWidth);
+        }
+        
         activeQuestions = [...furnitureQuestions.initial, ...branch];
     } else {
+        // Special branching for Oil Pressure Bed height
         if (key === 'hydraulic_height') {
-            filteredProducts = products.filter(p => p.category === '床' && p.bed_type === (value === '高身' ? '高身油壓床' : '油壓床'));
+            if (value === '高身') {
+                filteredProducts = products.filter(p => p.category === '床' && p.bed_type === '高身油壓床');
+            } else if (value === '普通高度') {
+                filteredProducts = products.filter(p => p.category === '床' && p.bed_type === '油壓床');
+            }
             activeQuestions.splice(currentQuestionIndex + 1, 0, { text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' });
         } else {
             applyFurnitureFilters(key, value);
         }
-        // 家具的分支邏輯
-        if (selectedCategory === '鞋櫃' && key === 'height_type' && value === '高身') { showFurnitureResults(); return; }
+
+        // Trigger branching questions
+        if (selectedCategory === '鞋櫃' && key === 'height_type' && value === '高身') { 
+            showFurnitureResults(); return; 
+        }
         if (selectedCategory === '床' && key === 'bed_type' && value === '油壓床') {
             activeQuestions.splice(currentQuestionIndex + 1, 0, { text: '您需要普通高度還是高身油壓床？', options: ['普通高度', '高身', '無偏好'], key: 'hydraulic_height' });
         }
         if (selectedCategory === '床' && key === 'bed_type' && value === '三櫃桶床') {
-            activeQuestions.push({ text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' }, { text: '需要連床尾櫃嗎？', options: ['有', '無', '無偏好'], key: 'with_tail_cabinet' });
+            activeQuestions.push(
+                { text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' }, 
+                { text: '需要連床尾櫃嗎？', options: ['有', '無', '無偏好'], key: 'with_tail_cabinet' }
+            );
         }
     }
 }
 
 function applyFurnitureFilters(key, value) {
     if (value === '無偏好' || key === 'hydraulic_height') return;
+    
     if (key === 'width') {
         filteredProducts = filteredProducts.filter(p => {
             if (!p.size) return true;
@@ -152,11 +166,17 @@ function applyFurnitureFilters(key, value) {
             return w > 1500;
         });
     } else {
-        filteredProducts = filteredProducts.filter(p => (key === 'mattress_size_mm' || key === 'bed_type') ? String(p[key]) === value : String(p[key]).includes(value));
+        filteredProducts = filteredProducts.filter(p => {
+            // Exact match for crucial specs to avoid 4ft vs 4.5ft confusion
+            if (key === 'mattress_size_mm' || key === 'bed_type' || key === 'bucket_count') {
+                return String(p[key]) === value;
+            }
+            return String(p[key]).includes(value);
+        });
     }
 }
 
-// --- 床褥邏輯 (新增) ---
+// --- MATTRESS LOGIC ---
 function handleMattressAnswer(key, value) {
     if (value === '無偏好') return;
     if (key === 'thickness_range') {
@@ -171,6 +191,7 @@ function handleMattressAnswer(key, value) {
     }
 }
 
+// --- RESULTS DISPLAY ---
 function showFurnitureResults() {
     const rEl = document.getElementById('results');
     document.getElementById('question').innerText = "為您挑選的建議家具：";
@@ -182,12 +203,12 @@ function showFurnitureResults() {
         filteredProducts.slice(0, 10).forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
-            card.style = "border:1px solid #d4a373; padding:15px; margin:15px 0; border-radius:10px;";
             card.innerHTML = `
-                <h4>型號: ${p.code}</h4>
-                <p><strong>尺寸:</strong> ${p.size} | <strong>顏色:</strong> ${p.color}</p>
+                <div class="product-code">型號: ${p.code}</div>
+                <p><strong>尺寸:</strong> ${p.size}</p>
+                <p><strong>顏色:</strong> ${p.color}</p>
                 <p><strong>備註:</strong> ${p.note || '無'}</p>
-                <button class="btn" style="background:#25D366; color:white; width:100%;" onclick="sendWA('家具', '${p.code}')">查詢價錢</button>
+                <button class="btn wa-query-btn" onclick="sendWA('家具', '${p.code}')">查詢價錢</button>
             `;
             rEl.appendChild(card);
         });
@@ -205,15 +226,16 @@ function showMattressResults() {
     } else {
         filteredProducts.forEach(m => {
             const card = document.createElement('div');
-            card.style = "border:1px solid #004a99; padding:15px; margin:15px 0; border-radius:10px; background:#f0f7ff;";
+            card.className = 'product-card';
+            card.style.borderLeft = "10px solid #004a99"; // Brand accent
             card.innerHTML = `
-                <h4 style="color:#004a99;">${m.name}</h4>
+                <div class="product-code" style="color:#004a99;">${m.name}</div>
                 <p><strong>軟硬度:</strong> ${m.hardness_desc} (約${m.hardness_value})</p>
                 <p><strong>厚度:</strong> 約 ${m.thickness} 吋</p>
                 <p><strong>🎁 贈品:</strong> ${m.gift}</p>
                 <p><strong>💡 備註:</strong> ${m.note}</p>
-                <a href="${m.link}" target="_blank" style="display:block; margin-bottom:10px; color:#004a99;">🌐 查看官方詳細介紹</a>
-                <button class="btn" style="background:#25D366; color:white; width:100%;" onclick="sendWA('床褥', '${m.name}')">詢問尺寸及價錢</button>
+                <a href="${m.link}" target="_blank" style="display:block; margin-bottom:10px; color:#004a99; font-weight:bold;">🌐 查看官方詳細介紹</a>
+                <button class="btn wa-query-btn" onclick="sendWA('床褥', '${m.name}')">詢問尺寸及價錢</button>
             `;
             rEl.appendChild(card);
         });
@@ -222,8 +244,9 @@ function showMattressResults() {
 }
 
 function finishQuiz() {
-    document.getElementById('restart').style.display = 'inline-block';
-    document.getElementById('restart').onclick = () => window.initQuiz();
+    const rBtn = document.getElementById('restart');
+    rBtn.style.display = 'inline-block';
+    rBtn.onclick = () => window.initQuiz();
     document.getElementById('whatsapp-reminder').style.display = 'block';
 }
 
@@ -232,4 +255,9 @@ window.sendWA = function(type, name) {
     window.open(`https://wa.me/85253908976?text=${encodeURIComponent(msg)}`);
 };
 
-window.onload = window.initQuiz;
+// Initialize on Load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initQuiz);
+} else {
+    window.initQuiz();
+}
