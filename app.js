@@ -79,29 +79,41 @@ window.handleAnswer = function(key, value) {
         if (questions[selectedCategory]) {
             branch = [...questions[selectedCategory]];
         }
-
         if (selectedCategory === '床頭櫃') { branch = []; }
-
         const categoriesToSkipSize = ['床', '床頭櫃', '桶櫃']; 
         if (!categoriesToSkipSize.includes(selectedCategory)) {
             branch.push(questions.sizeWidth);
         }
-
         activeQuestions = [...questions.initial, ...branch];
+
     } else {
         userAnswers[key] = value;
-        applyFilters(key, value);
-        
-        // --- BRANCHING LOGIC ---
 
-        // 1. Shoe Cabinet High Body skip
+        // --- SPECIAL FIX FOR HYDRAULIC BED HEIGHT ---
+        if (key === 'hydraulic_height') {
+            if (value === '高身') {
+                // We "reset" the bed_type filter to look for the High version specifically
+                filteredProducts = products.filter(p => p.category === '床' && p.bed_type === '高身油壓床');
+            } else if (value === '普通高度') {
+                filteredProducts = products.filter(p => p.category === '床' && p.bed_type === '油壓床');
+            }
+            
+            // Add the leather question after height is chosen
+            activeQuestions.splice(currentQuestionIndex + 1, 0, { 
+                text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' 
+            });
+        } else {
+            // Normal filtering for everything else
+            applyFilters(key, value);
+        }
+        
+        // --- OTHER BRANCHING ---
         if (selectedCategory === '鞋櫃' && key === 'height_type' && value === '高身') {
             showResults(); return;
         }
 
-        // 2. Bed Branching
         if (selectedCategory === '床') {
-            // A. If Oil Pressure Bed -> Ask for Height
+            // If user picks 油壓床, insert the height question
             if (key === 'bed_type' && value === '油壓床') {
                 activeQuestions.splice(currentQuestionIndex + 1, 0, { 
                     text: '您需要普通高度還是高身油壓床？', 
@@ -109,21 +121,7 @@ window.handleAnswer = function(key, value) {
                     key: 'hydraulic_height' 
                 });
             }
-
-            // B. Filter logic for Hydraulic Height
-            if (key === 'hydraulic_height') {
-                if (value === '高身') {
-                    filteredProducts = filteredProducts.filter(p => p.bed_type === '高身油壓床');
-                } else if (value === '普通高度') {
-                    filteredProducts = filteredProducts.filter(p => p.bed_type === '油壓床');
-                }
-                // Insert Leather question after height selection
-                activeQuestions.splice(currentQuestionIndex + 1, 0, { 
-                    text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' 
-                });
-            }
-
-            // C. Three Drawer Bed extras
+            // Three Drawer Bed extras
             if (key === 'bed_type' && value === '三櫃桶床') {
                 activeQuestions.push({ text: '床頭需要皮墊嗎？', options: ['有', '無', '無偏好'], key: 'headboard_leather' });
                 activeQuestions.push({ text: '需要連床尾櫃嗎？', options: ['有', '無', '無偏好'], key: 'with_tail_cabinet' });
@@ -134,6 +132,7 @@ window.handleAnswer = function(key, value) {
     currentQuestionIndex++;
     askNextQuestion();
 };
+
 
 function applyFilters(key, value) {
     if (value === '無偏好' || value === '其他/無偏好' || key === 'hydraulic_height') return;
