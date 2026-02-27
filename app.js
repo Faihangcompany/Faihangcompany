@@ -198,7 +198,7 @@ function showFurnitureResults() {
     document.getElementById('options').innerHTML = '';
     
     if (filteredProducts.length === 0) {
-        rEl.innerHTML = "<p>沒有符合家具，請嘗試重新開始。</p>";
+        rEl.innerHTML = "<p>沒有符合家具，請直接WhatsApp店員查詢。</p>";
     } else {
         filteredProducts.slice(0, 10).forEach(p => {
             const card = document.createElement('div');
